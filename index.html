@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mary</title>
+  <!-- Load Poppins from Google Fonts for consistent rendering -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin:0; padding:0; }
     html, body { height:100%; }
@@ -12,26 +14,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(145deg, #ffe6ee, #fff4f8);
+      background: linear-gradient(145deg, #fffafc, #fff7fe);
       overflow: hidden;
-      color: #333;
+      color: #2b2b2b;
     }
     .container {
-      background: #fff;
+      background: #ffffffcc;
+      backdrop-filter: blur(6px);
       border-radius: 25px;
       padding: 30px 20px;
-      max-width: 500px;
-      width: 90%;
+      max-width: 540px;
+      width: 92%;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 14px 40px rgba(40,20,60,0.08);
+      position: relative; /* make absolute-positioned buttons be relative to this box */
     }
     #bear {
-      width: 200px;
+      width: 220px;
       border-radius: 18px;
       opacity: 0;
       transform: translateY(10px);
       transition: opacity 1s ease, transform 1s ease;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     h1 {
       font-size: 22px;
@@ -39,174 +43,203 @@
       opacity: 0;
       transform: translateY(10px);
       transition: opacity 1s ease, transform 1s ease;
+      color: #2b2b2b;
     }
     .buttons {
-      margin-top: 25px;
+      margin-top: 22px;
       opacity: 0;
       transform: translateY(10px);
       transition: opacity 1s ease, transform 1s ease;
+      display: inline-block;
+      position: relative; /* keep normal flow but allow absolute child positioning */
     }
     button {
-      background: #ffccd9;
-      color: #333;
+      background: linear-gradient(180deg,#ffd7e6,#ffbfd6);
+      color: #221;
       border: none;
-      border-radius: 20px;
-      padding: 10px 25px;
-      margin: 0 12px;
+      border-radius: 22px;
+      padding: 10px 24px;
+      margin: 0 10px;
       font-size:16px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.10);
-      transition: all .25s ease;
+      box-shadow: 0 6px 18px rgba(120,30,80,0.08);
+      transition: transform .18s ease, box-shadow .18s ease;
     }
     button:hover {
-      background: #ffc1d3;
-      transform: scale(1.07);
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 10px 30px rgba(120,30,80,0.12);
+    }
+    button:focus {
+      outline: 3px solid rgba(255, 153, 180, 0.35);
+      outline-offset: 3px;
+    }
+    #no {
+      z-index: 5;
+      touch-action: manipulation;
     }
     .fade-in {
       opacity:1 !important;
       transform: none !important;
     }
+    .audio-hint {
+      font-size:12px;
+      color:#666;
+      margin-top:8px;
+      opacity:0.9;
+    }
+    @media (max-width: 420px) {
+      #bear { width: 160px; }
+      h1 { font-size: 18px; padding: 0 6px; }
+      button { padding: 8px 16px; margin: 6px; font-size:15px; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img id="bear" src="https://media.tenor.com/b3TmxS2k2FM.gif" alt="cute bear couple">
+  <div class="container" role="main" aria-labelledby="text" id="container">
+    <!-- keep original two-bear gif as primary image -->
+    <img id="bear" src="https://media.tenor.com/b3TmxS2k2FM.gif" alt="two cute bears hugging" />
     <h1 id="text">Hey Mary, can I ask you something sweet?</h1>
     <div class="buttons" id="buttons">
-      <button id="yes">Yes</button>
-      <button id="no">No</button>
+      <button id="yes" aria-label="Yes, tell me">Yes</button>
+      <button id="no" aria-label="No, I don't want to answer">No</button>
     </div>
+    <div class="audio-hint" id="audioHint">Tap anywhere to start the piano softly.</div>
   </div>
+
+  <!-- soft piano loop (will start on first user interaction) -->
+  <audio id="piano" src="https://assets.mixkit.co/music/preview/mixkit-sentimental-piano-366.mp3" loop preload="auto"></audio>
 
   <script>
     const slides = [
-      {
-        msg: "Hey Mary, can I ask you something sweet?",
-        gif: "https://media.tenor.com/b3TmxS2k2FM.gif"
-      },
-      {
-        msg: "When you talk, the day feels lighter somehow.",
-        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif"
-      },
-      {
-        msg: "You say I tease too much — maybe you blush too easy.",
-        gif: "https://media.tenor.com/b3TmxS2k2FM.gif"
-      },
-      {
-        msg: "So tell me... do you ever think of me when things go quiet?",
-        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif"
-      },
-      {
-        msg: "Come on now... don’t lie to me.",
-        gif: "https://media.tenor.com/b3TmxS2k2FM.gif",
-        runaway: true
-      },
-      {
-        msg: "The truth always tries to run — just like that button.",
-        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif",
-        runaway: true
-      },
-      {
-        msg: "Guess that leaves one answer left.",
-        gif: "https://media.tenor.com/b3TmxS2k2FM.gif",
-        runaway: true
-      },
-      {
-        msg: "Knew it. you said yes",
-        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif",
-        final: true
-      }
+      { msg: "Hey Mary, can I ask you something sweet?", gif: "https://media.tenor.com/b3TmxS2k2FM.gif" },
+      { msg: "When you talk, the day feels lighter somehow.", gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif" },
+      { msg: "You say I tease too much — maybe you blush too easy.", gif: "https://media.tenor.com/b3TmxS2k2FM.gif" },
+      { msg: "So tell me... do you ever think of me when things go quiet?", gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif" },
+      { msg: "Come on now... don’t lie to me.", gif: "https://media.tenor.com/b3TmxS2k2FM.gif" },
+      { msg: "The truth always tries to run — but let’s be honest.", gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif" },
+      { msg: "Guess that leaves one answer left.", gif: "https://media.tenor.com/b3TmxS2k2FM.gif" },
+      // final slide: show the same cute-bear gif and enable 'no' to run away on attempts
+      { msg: "So... what's your answer?", gif: "https://media.tenor.com/b3TmxS2k2FM.gif", final: true, runaway: true }
     ];
 
+    const container = document.getElementById("container");
     const bear = document.getElementById("bear");
     const text = document.getElementById("text");
     const yes = document.getElementById("yes");
     const no = document.getElementById("no");
     const buttons = document.getElementById("buttons");
+    const piano = document.getElementById("piano");
+    const audioHint = document.getElementById("audioHint");
 
     let idx = 0;
-    let runaway = false;
     let finalStage = false;
-    let moveInterval = null;
+    let runawayEnabled = false;
 
-    function clearMove() {
-      if(moveInterval) {
-        clearInterval(moveInterval);
-        moveInterval = null;
-      }
+    // attempt to start piano on first user gesture (many browsers block autoplay)
+    let audioStarted = false;
+    function tryStartAudio() {
+      if (audioStarted) return;
+      piano.volume = 0.28; // gentle volume
+      piano.play().then(() => {
+        audioStarted = true;
+        if (audioHint) audioHint.style.opacity = 0;
+      }).catch(() => {
+        // ignore; will start on subsequent gestures
+      });
     }
+    // Start audio when user interacts anywhere (once)
+    window.addEventListener('pointerdown', tryStartAudio, { once: true });
+    window.addEventListener('touchstart', tryStartAudio, { once: true, passive: true });
 
-    function moveNoRandom() {
-      const padding = 16;
-      const maxX = window.innerWidth - no.offsetWidth - padding;
-      const maxY = window.innerHeight - no.offsetHeight - padding;
-      const x = Math.random() * maxX + padding;
-      const y = Math.random() * maxY + padding;
-      no.style.position = "absolute";
+    function moveNoRandomInsideContainer() {
+      const padding = 12;
+      const contRect = container.getBoundingClientRect();
+      const maxX = Math.max(0, container.clientWidth - no.offsetWidth - padding * 2);
+      const maxY = Math.max(0, container.clientHeight - no.offsetHeight - padding * 2);
+      let x = padding;
+      let y = container.clientHeight - no.offsetHeight - padding;
+      if (maxX > 0 && maxY > 0) {
+        x = Math.random() * maxX + padding;
+        y = Math.random() * maxY + padding;
+      } else {
+        x = (Math.random() * 10) - 5;
+        y = (Math.random() * 10) - 5;
+      }
+      no.style.position = 'absolute';
       no.style.left = `${x}px`;
       no.style.top = `${y}px`;
+      // small feedback: add quick transform then remove
+      no.style.transition = 'transform 180ms ease, left 220ms ease, top 220ms ease';
+      no.style.transform = 'translateY(-6px)';
+      setTimeout(() => { no.style.transform = ''; }, 250);
     }
 
-    function startRunaway() {
-      clearMove();
-      moveInterval = setInterval(moveNoRandom, 200);
-      no.onclick = e => {
-        if(finalStage) {
-          e.preventDefault();
-          return false;
-        }
-      };
+    // remove any handlers used for runaway to avoid duplicates
+    function clearRunawayHandlers() {
+      no.onmouseenter = null;
+      no.ontouchstart = null;
+      no.onclick = null;
     }
 
     function showSlide(i) {
       const s = slides[i];
-      clearMove();
-      bear.classList.remove("fade-in");
-      text.classList.remove("fade-in");
-      buttons.classList.remove("fade-in");
+      clearRunawayHandlers();
+      bear.classList.remove('fade-in');
+      text.classList.remove('fade-in');
+      buttons.classList.remove('fade-in');
+
+      // reset to normal flow for earlier slides
+      no.style.position = '';
+      no.style.left = '';
+      no.style.top = '';
+      no.style.transition = '';
 
       setTimeout(() => {
         bear.src = s.gif;
         text.textContent = s.msg;
-        bear.classList.add("fade-in");
-        text.classList.add("fade-in");
-        buttons.classList.add("fade-in");
+        bear.classList.add('fade-in');
+        text.classList.add('fade-in');
+        buttons.classList.add('fade-in');
 
-        runaway = !!s.runaway;
         finalStage = !!s.final;
+        runawayEnabled = !!s.runaway;
 
-        if(runaway || finalStage) {
-          startRunaway();
-        }
-
-        if(finalStage) {
+        if (finalStage && runawayEnabled) {
+          // In final slide, make No try to run away when hovered or clicked
+          no.onmouseenter = () => moveNoRandomInsideContainer();
+          no.ontouchstart = (e) => { e.preventDefault(); moveNoRandomInsideContainer(); };
+          no.onclick = (e) => { e.preventDefault(); moveNoRandomInsideContainer(); return false; };
           yes.onclick = () => {
-            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Poppins,sans-serif;">
-              <div style="text-align:center;">
-                <img src="${s.gif}" style="width:200px;border-radius:15px;margin-bottom:20px;">
-                <p style="font-size:22px;color:#333;">Mary said Yes 💕</p>
+            // reveal the user's requested final message
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Poppins,sans-serif;background:linear-gradient(145deg,#fffafc,#fff7fe);">
+              <div style="text-align:center;padding:20px;">
+                <img src="${s.gif}" style="width:220px;border-radius:15px;margin-bottom:20px;" alt="celebration">
+                <p style="font-size:24px;color:#222;margin:0;">my personal lil ---------</p>
               </div>
             </div>`;
           };
         } else {
+          // Normal progression for non-final slides
           yes.onclick = () => { nextSlide(); };
-          no.onclick = () => {
-            if(!finalStage) nextSlide();
-          };
+          no.onclick = () => { nextSlide(); };
         }
       }, 300);
     }
 
-    function nextSlide(){
+    function nextSlide() {
       idx++;
-      if(idx >= slides.length) idx = slides.length - 1;
+      if (idx >= slides.length) idx = slides.length - 1;
       showSlide(idx);
     }
 
-    no.addEventListener("mouseenter", () => {
-      if(runaway || finalStage) moveNoRandom();
-    });
+    // provide playful move when user approaches 'no' during final stage (also for touch)
+    no.addEventListener('mouseenter', () => { if (runawayEnabled) moveNoRandomInsideContainer(); });
+    no.addEventListener('touchstart', (e) => { if (runawayEnabled) { e.preventDefault(); moveNoRandomInsideContainer(); } }, { passive: false });
 
+    // Keyboard nav: right arrow advances slides
+    window.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') nextSlide(); });
+
+    // show initial slide
     showSlide(idx);
   </script>
 </body>
