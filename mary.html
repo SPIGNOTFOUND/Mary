@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mary</title>
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html, body { height:100%; }
+    body {
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #ffe6ee, #fff4f8);
+      overflow: hidden;
+      color: #333;
+    }
+    .container {
+      background: #fff;
+      border-radius: 25px;
+      padding: 30px 20px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    #bear {
+      width: 200px;
+      border-radius: 18px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 1s ease, transform 1s ease;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 10px 0;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    .buttons {
+      margin-top: 25px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    button {
+      background: #ffccd9;
+      color: #333;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 25px;
+      margin: 0 12px;
+      font-size:16px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.10);
+      transition: all .25s ease;
+    }
+    button:hover {
+      background: #ffc1d3;
+      transform: scale(1.07);
+    }
+    .fade-in {
+      opacity:1 !important;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img id="bear" src="https://media.tenor.com/b3TmxS2k2FM.gif" alt="cute bear couple">
+    <h1 id="text">Hey Mary, can I ask you something sweet?</h1>
+    <div class="buttons" id="buttons">
+      <button id="yes">Yes</button>
+      <button id="no">No</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = [
+      {
+        msg: "Hey Mary, can I ask you something sweet?",
+        gif: "https://media.tenor.com/b3TmxS2k2FM.gif"
+      },
+      {
+        msg: "When you talk, the day feels lighter somehow.",
+        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif"
+      },
+      {
+        msg: "You say I tease too much — maybe you blush too easy.",
+        gif: "https://media.tenor.com/b3TmxS2k2FM.gif"
+      },
+      {
+        msg: "So tell me... do you ever think of me when things go quiet?",
+        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif"
+      },
+      {
+        msg: "Come on now... don’t lie to me.",
+        gif: "https://media.tenor.com/b3TmxS2k2FM.gif",
+        runaway: true
+      },
+      {
+        msg: "The truth always tries to run — just like that button.",
+        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif",
+        runaway: true
+      },
+      {
+        msg: "Guess that leaves one answer left.",
+        gif: "https://media.tenor.com/b3TmxS2k2FM.gif",
+        runaway: true
+      },
+      {
+        msg: "Knew it. you said yes",
+        gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif",
+        final: true
+      }
+    ];
+
+    const bear = document.getElementById("bear");
+    const text = document.getElementById("text");
+    const yes = document.getElementById("yes");
+    const no = document.getElementById("no");
+    const buttons = document.getElementById("buttons");
+
+    let idx = 0;
+    let runaway = false;
+    let finalStage = false;
+    let moveInterval = null;
+
+    function clearMove() {
+      if(moveInterval) {
+        clearInterval(moveInterval);
+        moveInterval = null;
+      }
+    }
+
+    function moveNoRandom() {
+      const padding = 16;
+      const maxX = window.innerWidth - no.offsetWidth - padding;
+      const maxY = window.innerHeight - no.offsetHeight - padding;
+      const x = Math.random() * maxX + padding;
+      const y = Math.random() * maxY + padding;
+      no.style.position = "absolute";
+      no.style.left = `${x}px`;
+      no.style.top = `${y}px`;
+    }
+
+    function startRunaway() {
+      clearMove();
+      moveInterval = setInterval(moveNoRandom, 200);
+      no.onclick = e => {
+        if(finalStage) {
+          e.preventDefault();
+          return false;
+        }
+      };
+    }
+
+    function showSlide(i) {
+      const s = slides[i];
+      clearMove();
+      bear.classList.remove("fade-in");
+      text.classList.remove("fade-in");
+      buttons.classList.remove("fade-in");
+
+      setTimeout(() => {
+        bear.src = s.gif;
+        text.textContent = s.msg;
+        bear.classList.add("fade-in");
+        text.classList.add("fade-in");
+        buttons.classList.add("fade-in");
+
+        runaway = !!s.runaway;
+        finalStage = !!s.final;
+
+        if(runaway || finalStage) {
+          startRunaway();
+        }
+
+        if(finalStage) {
+          yes.onclick = () => {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Poppins,sans-serif;">
+              <div style="text-align:center;">
+                <img src="${s.gif}" style="width:200px;border-radius:15px;margin-bottom:20px;">
+                <p style="font-size:22px;color:#333;">Mary said Yes 💕</p>
+              </div>
+            </div>`;
+          };
+        } else {
+          yes.onclick = () => { nextSlide(); };
+          no.onclick = () => {
+            if(!finalStage) nextSlide();
+          };
+        }
+      }, 300);
+    }
+
+    function nextSlide(){
+      idx++;
+      if(idx >= slides.length) idx = slides.length - 1;
+      showSlide(idx);
+    }
+
+    no.addEventListener("mouseenter", () => {
+      if(runaway || finalStage) moveNoRandom();
+    });
+
+    showSlide(idx);
+  </script>
+</body>
+</html>
