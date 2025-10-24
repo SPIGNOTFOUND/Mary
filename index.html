@@ -1,140 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mary</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Beautiful in White</title>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%}
-    body{
-      font-family:"Poppins",sans-serif;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#fff;
-      color:#111;
-      overflow:hidden;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .container{
-      width:92%;max-width:620px;background:#fff;
-      border-radius:18px;padding:34px 26px;
-      text-align:center;
-      box-shadow:0 18px 40px rgba(20,20,30,0.06);
-      position:relative;
+
+    body {
+      background-color: white;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow: hidden;
+      color: #333;
     }
-    #bear{width:240px;border-radius:14px;margin:0 auto 18px;display:block;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s}
-    h1{font-size:22px;margin-bottom:8px;opacity:0;transform:translateY(6px);transition:opacity .6s,transform .6s}
-    .buttons{margin-top:16px;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s}
-    button{
-      background:linear-gradient(180deg,#fff,#faf8fb);
-      border:1px solid rgba(0,0,0,0.06);
-      padding:10px 22px;border-radius:20px;margin:0 10px;cursor:pointer;font-size:16px;
-      box-shadow:0 8px 22px rgba(0,0,0,0.04);
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.3em;
+      animation: fadeIn 2.5s ease-in-out;
     }
-    .fade-in{opacity:1!important;transform:none!important}
-    #noMessage{margin-top:10px;font-size:13px;color:#b00020;display:none}
-    .overlay{
-      position:fixed;inset:0;display:none;
-      align-items:center;justify-content:center;
-      background:rgba(255,255,255,0.95);z-index:9999;
+
+    p {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      color: #666;
+      animation: fadeIn 3s ease-in-out;
     }
-    .celebrate{text-align:center;padding:26px;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,0.08);background:#fff;}
-    .celebrate img{width:260px;border-radius:14px;display:block;margin:0 auto 14px;}
-    .celebrate p{font-size:22px;color:#111;margin:0;}
-    @media(max-width:480px){#bear{width:160px}h1{font-size:18px}button{padding:8px 14px;margin:6px}.celebrate img{width:180px}}
+
+    .gif {
+      width: 300px;
+      height: auto;
+      border-radius: 20px;
+      margin: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .container {
+      text-align: center;
+      animation: fadeIn 2s ease-in-out;
+    }
   </style>
 </head>
 <body>
-  <div class="container" id="container">
-    <img id="bear" src="https://media.tenor.com/wYz6PjaKZggAAAAM/anime-hug.gif" alt="anime hug" />
-    <h1 id="text">Hey Mary, can I ask you something sweet?</h1>
-    <div class="buttons" id="buttons">
-      <button id="yes">Yes</button>
-      <button id="no">No</button>
-    </div>
-    <div id="noMessage">No is not an option 😜</div>
+  <!-- Background music -->
+  <audio autoplay loop>
+    <source src="https://cdn.discordapp.com/attachments/987259731557117952/1431173921951977533/Beautiful_in_White_-_Shane_Filan.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="container">
+    <h1>✨ Beautiful in White ✨</h1>
+    <p>Let love fill the silence.</p>
+    <img class="gif" src="https://media.tenor.com/B3TmxS2k2FMAAAAC/beautiful-nature.gif" alt="Nature">
+    <img class="gif" src="https://media.tenor.com/lCZrR_0mZjIAAAAC/romantic-sunset.gif" alt="Sunset">
+    <img class="gif" src="https://media.tenor.com/TkA5xGmkuwEAAAAC/wedding-couple-love.gif" alt="Couple">
   </div>
-
-  <audio id="piano" loop preload="auto" src="https://cdn.pixabay.com/audio/2022/03/30/audio_aa5ed7e2cf.mp3"></audio>
-
-  <div class="overlay" id="overlay">
-    <div class="celebrate">
-      <img id="celebrateGif" src="" alt="celebration">
-      <p id="celebrateText">You said yes 💕</p>
-    </div>
-  </div>
-
-  <script>
-    const slides = [
-      { msg:"Hey Mary, can I ask you something sweet?", gif:"https://media.tenor.com/wYz6PjaKZggAAAAM/anime-hug.gif"},
-      { msg:"When you talk, the world feels a little softer 🌸", gif:"https://media.tenor.com/IzgW6AoqNpAAAAAM/anime-love.gif"},
-      { msg:"You blush too easily... or maybe I tease too well 😏", gif:"https://media.tenor.com/XnB2jDyoSoYAAAAM/anime-blush.gif"},
-      { msg:"So tell me... do you ever think of me when it's quiet?", gif:"https://media.tenor.com/gb5rKkKQax8AAAAM/anime-shy.gif"},
-      { msg:"Come on now, don’t lie to me~", gif:"https://media.tenor.com/7h3WiIbt0Z4AAAAM/anime-wink.gif"},
-      { msg:"Guess that leaves one answer left 💖", gif:"https://media.tenor.com/m8NRVdaF8ksAAAAM/anime-heart.gif"},
-      { msg:"So... what's your answer?", gif:"https://media.tenor.com/kqHqXAwCcf0AAAAM/anime-hug-love.gif", final:true, runaway:true}
-    ];
-
-    const piano=document.getElementById('piano');
-    const bear=document.getElementById('bear');
-    const text=document.getElementById('text');
-    const yes=document.getElementById('yes');
-    const no=document.getElementById('no');
-    const container=document.getElementById('container');
-    const overlay=document.getElementById('overlay');
-    const celebrateGif=document.getElementById('celebrateGif');
-    let idx=0, musicStarted=false;
-
-    function revealUI(){bear.classList.add('fade-in');text.classList.add('fade-in');document.getElementById('buttons').classList.add('fade-in');}
-    setTimeout(revealUI,80);
-
-    function playMusic(){
-      if(!musicStarted){
-        piano.muted=false;
-        piano.volume=0.8;
-        piano.play().catch(()=>{});
-        musicStarted=true;
-      }
-    }
-
-    function moveNoRandom(){
-      const maxX=container.clientWidth-no.offsetWidth-40;
-      const maxY=container.clientHeight-no.offsetHeight-40;
-      const x=Math.random()*maxX;
-      const y=Math.random()*maxY;
-      no.style.position='absolute';
-      no.style.left=`${x}px`;
-      no.style.top=`${y}px`;
-    }
-
-    function showCelebration(s){
-      celebrateGif.src=s.gif;
-      overlay.style.display='flex';
-    }
-
-    function nextSlide(){
-      idx++;
-      if(idx>=slides.length) idx=slides.length-1;
-      showSlide(idx);
-    }
-
-    function showSlide(i){
-      const s=slides[i];
-      bear.src=s.gif;
-      text.textContent=s.msg;
-      if(s.final&&s.runaway){
-        no.onmouseenter=()=>moveNoRandom();
-        no.ontouchstart=e=>{e.preventDefault();moveNoRandom()};
-        yes.onclick=()=>{showCelebration(s);};
-      }else{
-        yes.onclick=()=>{playMusic();nextSlide();};
-        no.onclick=()=>{playMusic();nextSlide();};
-      }
-    }
-
-    showSlide(idx);
-  </script>
 </body>
 </html>
