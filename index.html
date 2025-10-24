@@ -13,37 +13,39 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background:#ffffff; /* white theme */
+      background:#ffffff;
       color:#111;
       overflow:hidden;
     }
-    .container {
-      width:92%; max-width:620px; background:#fff; border-radius:18px; padding:34px 26px;
-      text-align:center; box-shadow:0 18px 40px rgba(20,20,30,0.06); position:relative;
-    }
-    #bear { width:240px; border-radius:14px; margin:0 auto 18px; display:block; opacity:0; transform:translateY(10px); transition:opacity .7s ease, transform .7s ease; }
-    h1 { font-size:22px; margin-bottom:8px; opacity:0; transform:translateY(6px); transition:opacity .7s ease, transform .7s ease; }
-    .buttons { margin-top:16px; opacity:0; transform:translateY(10px); transition:opacity .7s ease, transform .7s ease; }
+    .container { width:92%; max-width:620px; background:#fff; border-radius:18px; padding:34px 26px; text-align:center; box-shadow:0 18px 40px rgba(20,20,30,0.06); position:relative; }
+    #bear { width:240px; border-radius:14px; margin:0 auto 18px; display:block; opacity:0; transform:translateY(10px); transition:opacity .6s ease, transform .6s ease; }
+    h1 { font-size:22px; margin-bottom:8px; opacity:0; transform:translateY(6px); transition:opacity .6s ease, transform .6s ease; }
+    .buttons { margin-top:16px; opacity:0; transform:translateY(10px); transition:opacity .6s ease, transform .6s ease; }
     button { background:linear-gradient(180deg,#fff,#faf8fb); border:1px solid rgba(0,0,0,0.06); padding:10px 22px; border-radius:20px; margin:0 10px; cursor:pointer; font-size:16px; box-shadow:0 8px 22px rgba(0,0,0,0.04); }
     button:focus { outline:3px solid rgba(0,0,0,0.06); outline-offset:3px; }
     .fade-in { opacity:1 !important; transform:none !important; }
-    .hint { font-size:13px; color:#666; margin-top:12px; }
+    .hint { font-size:13px; color:#666; margin-top:12px; display:none; }
     #noMessage { margin-top:10px; font-size:13px; color:#b00020; display:none; }
+    /* celebration overlay */
+    .overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(255,255,255,0.95); z-index:9999; }
+    .celebrate { text-align:center; padding:26px; border-radius:14px; box-shadow:0 14px 40px rgba(0,0,0,0.08); background:#fff; }
+    .celebrate img { width:260px; border-radius:14px; display:block; margin: 0 auto 14px; }
+    .celebrate p { font-size:22px; color:#111; margin:0; }
     /* modal */
     .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:9998; }
     .modal { background:#fff; padding:20px; border-radius:12px; width: min(560px, 92%); box-shadow:0 12px 36px rgba(0,0,0,0.2); }
     .modal h3 { margin-bottom:8px; }
-    .modal p { color:#333; margin-bottom:12px; line-height:1.35; }
+    .modal p, .modal ul { color:#333; margin-bottom:12px; line-height:1.35; text-align:left; }
     .modal button { margin-right:8px; }
     #unmute { position:fixed; left:14px; bottom:14px; background:#111; color:#fff; padding:8px 10px; border-radius:12px; display:none; align-items:center; gap:8px; z-index:9999; box-shadow:0 8px 30px rgba(0,0,0,0.14); }
     #unmute button { background:#f7f7f7; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; color:#111; }
-    @media (max-width:480px) { #bear{width:160px;} h1{font-size:18px;} button{padding:8px 14px;margin:6px;} }
+    @media (max-width:480px) { #bear{width:160px;} h1{font-size:18px;} button{padding:8px 14px;margin:6px;} .celebrate img{width:180px;} }
   </style>
 </head>
 <body>
   <div class="container" id="container" role="main" aria-labelledby="text">
-    <!-- chosen GIFs from GIPHY (more reliable) -->
-    <img id="bear" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="two cute bears hugging" />
+    <!-- cute GIF; JS will swap to fallback inline SVG if a GIF fails -->
+    <img id="bear" src="https://media.tenor.com/b3TmxS2k2FM.gif" alt="cute animals hugging" />
     <h1 id="text">Hey Mary, can I ask you something sweet?</h1>
 
     <div class="buttons" id="buttons">
@@ -52,10 +54,10 @@
     </div>
 
     <div id="noMessage">No is not an option</div>
-    <div class="hint" id="hint">Music should autoplay. If it doesn't, use the Unmute control or open the popup to allow audio.</div>
+    <div class="hint" id="hint">If you don't hear music, press Unmute or follow the popup to allow audio for this site.</div>
   </div>
 
-  <!-- piano: autoplay + loop. Script will attempt autoplay and fall back to muted/play + show UI for the user to allow sound. -->
+  <!-- autoplay piano (best-effort). Script will attempt audible autoplay and fall back to muted playback + guidance -->
   <audio id="piano" autoplay loop playsinline preload="auto" src="https://assets.mixkit.co/music/preview/mixkit-sentimental-piano-366.mp3"></audio>
 
   <div id="unmute" aria-hidden="true">
@@ -66,14 +68,13 @@
   <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal" role="document" aria-labelledby="modalTitle">
       <h3 id="modalTitle">Allow audio</h3>
-      <p id="modalText">
-        Your browser appears to be blocking autoplay with sound. To hear the piano:
-        <ol>
-          <li>Press Retry (below) — this is a user gesture and may allow playback.</li>
-          <li>If you still see no sound, open your browser's site settings (click the padlock / site icon near the address bar) and allow Sound/Autoplay for this site.</li>
-          <li>After allowing, press Retry again or press Unmute.</li>
-        </ol>
-      </p>
+      <p id="modalText">Your browser blocked autoplay with sound. Press Retry (a user gesture) to try again. If that doesn't work, follow the instructions for your browser below:</p>
+      <ul>
+        <li><strong>Chrome (desktop)</strong>: Click the padlock → Site settings → Sound → Allow.</li>
+        <li><strong>Firefox</strong>: Click the padlock → More information → Permissions → Allow sound.</li>
+        <li><strong>Safari</strong>: Safari → Settings for This Website → Auto-Play → Allow All Auto-Play.</li>
+        <li><strong>Samsung Internet (mobile)</strong>: open the three-dot menu → Settings → Sites and downloads → Site permissions (or Media autoplay/Sound) → allow for this site. If you don't see a padlock action, use the browser settings as above.</li>
+      </ul>
       <div>
         <button id="retryBtn">Retry</button>
         <button id="guideBtn">How to allow</button>
@@ -82,18 +83,28 @@
     </div>
   </div>
 
+  <!-- celebration overlay shown after clicking Yes on final slide (keeps page intact; no full-page replacement) -->
+  <div class="overlay" id="overlay">
+    <div class="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrateTitle">
+      <img id="celebrateGif" src="" alt="celebration" />
+      <p id="celebrateText">You said yes 💕</p>
+    </div>
+  </div>
+
   <script>
     const slides = [
-      { msg: "Hey Mary, can I ask you something sweet?", gif: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" },
-      { msg: "When you talk, the day feels lighter somehow.", gif: "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" },
+      { msg: "Hey Mary, can I ask you something sweet?", gif: "https://media.tenor.com/b3TmxS2k2FM.gif" },
+      { msg: "When you talk, the day feels lighter somehow.", gif: "https://media.tenor.com/WJXkZ-7hJbMAAAAM/cute-cat-love.gif" },
       { msg: "You say I tease too much — maybe you blush too easy.", gif: "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" },
       { msg: "So tell me... do you ever think of me when things go quiet?", gif: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" },
-      { msg: "Come on now... don’t lie to me.", gif: "https://media.giphy.com/media/5xaOcLArzX4tQYQ8gqY/giphy.gif" },
-      { msg: "The truth always tries to run — but let’s be honest.", gif: "https://media.giphy.com/media/7mv6R9lXbJ7nO/giphy.gif" },
-      { msg: "Guess that leaves one answer left.", gif: "https://media.giphy.com/media/3o6ZsY9QJYpQ8k2F6U/giphy.gif" },
-      { msg: "So... what's your answer?", gif: "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif", final:true, runaway:true }
+      { msg: "Come on now... don’t lie to me.", gif: "https://media.giphy.com/media/11sBLVxNs7v6WA/giphy.gif" },
+      { msg: "The truth always tries to run — but let’s be honest.", gif: "https://media.giphy.com/media/3o6ZsY9QJYpQ8k2F6U/giphy.gif" },
+      { msg: "Guess that leaves one answer left.", gif: "https://media.giphy.com/media/13CoXDiaCcCoyk/giphy.gif" },
+      // final slide kept with runaway behaviour
+      { msg: "So... what's your answer?", gif: "https://media.tenor.com/b3TmxS2k2FM.gif", final: true, runaway: true }
     ];
 
+    // Elements
     const piano = document.getElementById('piano');
     const unmute = document.getElementById('unmute');
     const unmuteBtn = document.getElementById('unmuteBtn');
@@ -109,55 +120,53 @@
     const noMessage = document.getElementById('noMessage');
     const hint = document.getElementById('hint');
     const container = document.getElementById('container');
+    const overlay = document.getElementById('overlay');
+    const celebrateGif = document.getElementById('celebrateGif');
+    const celebrateText = document.getElementById('celebrateText');
 
     let idx = 0;
-    let finalStage=false;
-    let runawayEnabled=false;
+    let autoplayAttempted = false;
+    let hintShown = false;
 
-    // show UI transitions
-    function revealUI(){ bear.classList.add('fade-in'); text.classList.add('fade-in'); buttons.classList.add('fade-in'); }
+    // reveal UI once
+    function revealUI() { bear.classList.add('fade-in'); text.classList.add('fade-in'); buttons.classList.add('fade-in'); }
     setTimeout(revealUI, 80);
 
-    // fallback if a GIF fails to load
-    const gifFallbacks = [
-      'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif',
-      'https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif'
-    ];
-    bear.addEventListener('error', () => {
-      for (const url of gifFallbacks) {
-        if (bear.src !== url) { bear.src = url; return; }
-      }
-    });
+    // inline SVG fallback to avoid "content not available"
+    const svgFallback = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200"><rect width="100%" height="100%" fill="#fff"/><text x="50%" y="55%" font-size="28" text-anchor="middle" fill="#ff6ea1" font-family="Poppins,sans-serif">❤</text></svg>'
+    );
+    bear.addEventListener('error', () => { if (bear.src !== svgFallback) bear.src = svgFallback; });
 
-    // Attempt autoplay with sound. If blocked, try muted autoplay and show UI so the user can allow sound.
-    function attemptAutoplay(){
+    function showHint() { if (!hintShown) { hint.style.display = 'block'; hintShown = true; } }
+
+    // Attempt autoplay once on load
+    function attemptAutoplay() {
+      if (autoplayAttempted) return;
+      autoplayAttempted = true;
       piano.muted = false;
       piano.volume = 0.8;
       piano.play().then(() => {
-        // success with sound
         unmute.style.display = 'none';
-        hint.textContent = 'Music is playing.';
       }).catch(() => {
-        // blocked; try muted autoplay so playback is active for later unmute
+        // blocked; try muted autoplay so the audio element runs and can be unmuted later
         piano.muted = true;
         piano.play().then(() => {
           unmute.style.display = 'flex';
-          hint.textContent = 'Autoplay with sound is blocked. Use Unmute or follow the popup instructions.';
+          showHint();
           modalBackdrop.style.display = 'flex';
           modalBackdrop.setAttribute('aria-hidden','false');
         }).catch(() => {
-          // can't even autoplay muted: show unmute UI and modal
           unmute.style.display = 'flex';
+          showHint();
           modalBackdrop.style.display = 'flex';
           modalBackdrop.setAttribute('aria-hidden','false');
         });
       });
     }
-
-    // initial attempt
     attemptAutoplay();
 
-    // Unmute control: must be user gesture
+    // Unmute handler (user gesture)
     unmuteBtn.addEventListener('click', () => {
       piano.muted = false;
       piano.volume = 0.8;
@@ -165,15 +174,13 @@
         unmute.style.display = 'none';
         modalBackdrop.style.display = 'none';
         modalBackdrop.setAttribute('aria-hidden','true');
-        hint.textContent = 'Music is playing.';
       }).catch(() => {
         modalBackdrop.style.display = 'flex';
         modalBackdrop.setAttribute('aria-hidden','false');
-        alert('Playback still blocked. Please follow the instructions in the popup to allow audio for this site.');
+        alert('Playback still blocked. Follow the instructions in the popup to allow audio for this site.');
       });
     });
 
-    // Retry button: a user gesture to try playback again
     retryBtn.addEventListener('click', () => {
       piano.muted = false;
       piano.volume = 0.8;
@@ -181,21 +188,13 @@
         modalBackdrop.style.display = 'none';
         modalBackdrop.setAttribute('aria-hidden','true');
         unmute.style.display = 'none';
-        hint.textContent = 'Music is playing.';
       }).catch(() => {
-        alert('Audio still blocked. Open your browser site settings (padlock near address bar) and allow Sound/Autoplay for this site, then press Retry.');
+        alert('Audio still blocked. On Samsung Internet: open the three-dot menu → Settings → Sites and downloads → Site permissions → Sound (or Media autoplay) and allow for this site, then press Retry.');
       });
     });
 
     guideBtn.addEventListener('click', () => {
-      // Provide quick instructions — can't change browser settings programmatically
-      alert(
-        'How to allow autoplay/sound in common browsers:\n\n' +
-        'Chrome (desktop): Click the padlock in the address bar → Site settings → Sound → Allow.\n\n' +
-        'Firefox: Click the padlock → Connection secure → More Information → Permissions → Allow Sound.\n\n' +
-        'Safari: Safari menu → Settings for This Website → Auto-Play → Allow All Auto-Play.\n\n' +
-        'Mobile: open browser menu → site settings or press the site icon near the address bar and look for sound/permissions.'
-      );
+      alert('If your browser does not show a padlock action (mobile browsers like Samsung Internet): open the browser menu → Settings → Sites and downloads → Site permissions (or Media autoplay/Sound) → allow sound for this site, then press Retry.');
     });
 
     closeModalBtn.addEventListener('click', () => {
@@ -203,14 +202,16 @@
       modalBackdrop.setAttribute('aria-hidden','true');
     });
 
-    // No button movement logic
+    // No button movement for non-final slides; final slide will enable runaway behavior
     function moveNoRandomInsideContainer() {
       const padding = 12;
       const maxX = Math.max(0, container.clientWidth - no.offsetWidth - padding * 2);
       const maxY = Math.max(0, container.clientHeight - no.offsetHeight - padding * 2);
       let x = padding, y = padding;
       if (maxX > 0 && maxY > 0) { x = Math.random() * maxX + padding; y = Math.random() * maxY + padding; }
-      no.style.position = 'absolute'; no.style.left = `${x}px`; no.style.top = `${y}px`;
+      no.style.position = 'absolute';
+      no.style.left = `${x}px`;
+      no.style.top = `${y}px`;
       no.style.transition = 'left 240ms ease, top 240ms ease, transform 160ms ease';
       no.style.transform = 'translateY(-8px)'; setTimeout(()=>{ no.style.transform = ''; }, 220);
     }
@@ -219,63 +220,77 @@
       const padding = 20;
       const x = container.clientWidth + padding + Math.random() * 180;
       const y = Math.random() * Math.max(0, container.clientHeight - no.offsetHeight);
-      no.style.position = 'absolute'; no.style.left = `${x}px`; no.style.top = `${y}px`;
+      no.style.position = 'absolute';
+      no.style.left = `${x}px`;
+      no.style.top = `${y}px`;
       no.style.transition = 'left 420ms ease, top 420ms ease, opacity 220ms ease';
       no.style.opacity = '0.95';
       setTimeout(()=>{ no.disabled = true; no.style.pointerEvents = 'none'; }, 420);
     }
 
-    function clearNoHandlers() {
-      no.onmouseenter = null; no.ontouchstart = null; no.onclick = null;
+    function clearNoHandlers() { no.onmouseenter = null; no.ontouchstart = null; no.onclick = null; }
+
+    // show a small celebration overlay instead of replacing the entire document
+    function showCelebration(s) {
+      celebrateGif.src = s.gif || bear.src;
+      celebrateText.textContent = 'You said yes 💕';
+      overlay.style.display = 'flex';
+      overlay.setAttribute('aria-hidden','false');
     }
 
+    function hideCelebration() {
+      overlay.style.display = 'none';
+      overlay.setAttribute('aria-hidden','true');
+    }
+
+    // slide rendering
     function showSlide(i) {
       const s = slides[i];
       clearNoHandlers();
-      // reset any styles
-      no.style.position = ''; no.style.left=''; no.style.top=''; no.style.opacity=''; no.disabled = false; no.style.pointerEvents=''; noMessage.style.display='none';
+      // reset no styles
+      no.style.position = '';
+      no.style.left = '';
+      no.style.top = '';
+      no.style.opacity = '';
+      no.disabled = false;
+      no.style.pointerEvents = '';
+      noMessage.style.display = 'none';
 
-      setTimeout(()=>{
+      setTimeout(() => {
         bear.src = s.gif;
         text.textContent = s.msg;
         bear.classList.add('fade-in');
         text.classList.add('fade-in');
         buttons.classList.add('fade-in');
 
-        finalStage = !!s.final;
-        runawayEnabled = !!s.runaway;
-
-        if (finalStage && runawayEnabled) {
+        if (s.final && s.runaway) {
+          // final slide: make No run away and Yes open the celebration overlay
           no.onmouseenter = () => moveNoRandomInsideContainer();
           no.ontouchstart = (e) => { e.preventDefault(); moveNoRandomInsideContainer(); };
           no.onclick = (e) => { e.preventDefault(); moveNoCompletelyAway(); noMessage.style.display = 'block'; return false; };
 
-          yes.onclick = () => {
-            document.body.innerHTML = `
-              <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Poppins,sans-serif;background:#fff;">
-                <div style="text-align:center;padding:20px;">
-                  <img src="${s.gif}" style="width:260px;border-radius:14px;margin-bottom:20px;" alt="celebration"/>
-                  <p style="font-size:24px;color:#111;margin:0;">my personal lil ---------</p>
-                </div>
-              </div>`;
-          };
+          yes.onclick = () => { showCelebration(s); };
         } else {
-          yes.onclick = () => { nextSlide(); };
-          no.onclick = () => { nextSlide(); };
+          // default progression
+          yes.onclick = () => nextSlide();
+          no.onclick = () => nextSlide();
         }
-      }, 220);
+      }, 180);
     }
 
     function nextSlide() { idx++; if (idx >= slides.length) idx = slides.length - 1; showSlide(idx); }
 
-    // Retry autoplay when visibility changes (some mobile browsers allow after user focuses tab)
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) attemptAutoplay(); });
-
     // keyboard nav
     window.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') nextSlide(); });
+
+    // retry autoplay when visibility changes
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) attemptAutoplay(); });
+
+    // hide celebration when user clicks overlay
+    overlay.addEventListener('click', hideCelebration);
 
     // start
     showSlide(idx);
   </script>
 </body>
-</html>
+  </html>
