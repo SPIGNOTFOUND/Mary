@@ -1,77 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Beautiful in White</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mary — Beautiful in White</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* Basic reset */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:"Poppins",sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+      color:#111;
+      overflow:hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:20px;
     }
 
-    body {
-      background-color: white;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 100vh;
-      overflow: hidden;
-      color: #333;
+    /* Card */
+    .container{
+      width:92%;
+      max-width:640px;
+      background:#fff;
+      border-radius:18px;
+      padding:28px;
+      text-align:center;
+      box-shadow:0 18px 40px rgba(20,20,30,0.06);
+      position:relative;
+      min-height:420px;
     }
 
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 0.3em;
-      animation: fadeIn 2.5s ease-in-out;
+    /* Bear / gif */
+    #bear{
+      width:260px;
+      border-radius:14px;
+      margin: 0 auto 18px;
+      display:block;
+      opacity:0;
+      transform:translateY(10px);
+      transition:opacity .48s ease, transform .48s ease;
+      background:#fff;
     }
 
-    p {
-      font-size: 1.2em;
-      margin-bottom: 20px;
-      color: #666;
-      animation: fadeIn 3s ease-in-out;
+    h1{
+      font-size:22px;
+      margin-bottom:8px;
+      opacity:0;
+      transform:translateY(6px);
+      transition:opacity .48s ease, transform .48s ease;
+      color:#111;
     }
 
-    .gif {
-      width: 300px;
-      height: auto;
-      border-radius: 20px;
-      margin: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-      animation: float 6s ease-in-out infinite;
+    .buttons{
+      margin-top:16px;
+      opacity:0;
+      transform:translateY(10px);
+      transition:opacity .48s ease, transform .48s ease;
+      display:flex;
+      justify-content:center;
+      gap:12px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    button{
+      background:linear-gradient(180deg,#fff,#faf8fb);
+      border:1px solid rgba(0,0,0,0.06);
+      padding:10px 22px;
+      border-radius:20px;
+      cursor:pointer;
+      font-size:16px;
+      box-shadow:0 8px 22px rgba(0,0,0,0.04);
     }
+    button:active{ transform: translateY(1px) }
+    #no{ position:relative; }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
+    .fade-in{ opacity:1 !important; transform:none !important; }
 
-    .container {
-      text-align: center;
-      animation: fadeIn 2s ease-in-out;
+    .hint{ font-size:13px; color:#666; margin-top:12px; display:none; }
+
+    #noMessage{ margin-top:10px; font-size:13px; color:#b00020; display:none; }
+
+    /* celebration overlay */
+    .overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(255,255,255,0.95); z-index:9999; }
+    .celebrate{ text-align:center; padding:26px; border-radius:14px; box-shadow:0 14px 40px rgba(0,0,0,0.08); background:#fff; }
+    .celebrate img{ width:320px; border-radius:14px; display:block; margin: 0 auto 14px; }
+    .celebrate p{ font-size:22px; color:#111; margin:0; }
+
+    /* minimal unmute control */
+    #unmute{ position:fixed; left:14px; bottom:14px; background:#111; color:#fff; padding:8px 10px; border-radius:12px; display:none; align-items:center; gap:8px; z-index:9999; box-shadow:0 8px 30px rgba(0,0,0,0.14); }
+    #unmute button{ background:#f7f7f7; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; color:#111; }
+
+    /* modal fallback (kept hidden unless needed) */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:9998; }
+    .modal{ background:#fff; padding:18px; border-radius:12px; width:min(560px,92%); box-shadow:0 12px 36px rgba(0,0,0,0.2); }
+    .modal h3{ margin-bottom:8px; }
+    .modal p{ color:#333; margin-bottom:12px; line-height:1.35; text-align:left; }
+
+    @media (max-width:480px){
+      #bear{width:180px}
+      h1{font-size:18px}
+      button{padding:8px 14px;margin:6px}
+      .celebrate img{width:200px}
     }
   </style>
 </head>
 <body>
-  <!-- Background music -->
-  <audio autoplay loop>
-    <source src="https://cdn.discordapp.com/attachments/987259731557117952/1431173921951977533/Beautiful_in_White_-_Shane_Filan.mp3" type="audio/mpeg">
-  </audio>
+  <div class="container" id="container" role="main" aria-labelledby="text">
+    <!-- fallback to inline SVG on error -->
+    <img id="bear" src="https://media.tenor.com/wYz6PjaKZggAAAAM/anime-hug.gif" alt="cute anime hug" />
 
-  <div class="container">
-    <h1>✨ Beautiful in White ✨</h1>
-    <p>Let love fill the silence.</p>
-    <img class="gif" src="https://media.tenor.com/B3TmxS2k2FMAAAAC/beautiful-nature.gif" alt="Nature">
-    <img class="gif" src="https://media.tenor.com/lCZrR_0mZjIAAAAC/romantic-sunset.gif" alt="Sunset">
-    <img class="gif" src="https://media.tenor.com/TkA5xGmkuwEAAAAC/wedding-couple-love.gif" alt="Couple">
+    <h1 id="text">Hey Mary, can I ask you something sweet?</h1>
+
+    <div class="buttons" id="buttons">
+      <button id="yes" aria-label="Yes">Yes</button>
+      <button id="no" aria-label="No">No</button>
+    </div>
+
+    <div id="noMessage">No is not an option</div>
+    <div class="hint" id="hint">If audio doesn't play automatically, click any button to start.</div>
   </div>
+
+  <!-- audio: start muted — will unmute on first user gesture -->
+  <audio id="piano" loop preload="auto" src="https://cdn.discordapp.com/attachments/987259731557117952/1431173921951977533/Beautiful_in_White_-_Shane_Filan.mp3"></audio>
+
+  <div id="unmute" aria-hidden="true">
+    <span>🔊 Sound blocked?</span>
+    <button id="unmuteBtn">Unmute</button>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true" style="display:none">
+    <div class="modal" role="document" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Allow audio</h3>
+      <p id="modalText">Your browser blocked autoplay. Click "Unmute" to try again or follow your browser's site settings to allow sound for this site.</p>
+      <div style="text-align:right"><button id="closeModalBtn">Close</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrateTitle">
+      <img id="celebrateGif" src="" alt="celebration" />
+      <p id="celebrateText">You said yes 💕</p>
+    </div>
+  </div>
+
+  <script>
+    /*******************************
+     * Slides + gifs (anime working)
+     *******************************/
+    const slides = [
+      { msg: "Hey Mary, can I ask you something sweet?", gif: "https://media.tenor.com/wYz6PjaKZggAAAAM/anime-hug.gif" },
+      { msg: "When you talk, the day feels lighter somehow.", gif: "https://media.tenor.com/IzgW6AoqNpAAAAAM/anime-love.gif" },
+      { msg: "You say I tease too much — maybe you blush too easy.", gif: "https://media.tenor.com/XnB2jDyoSoYAAAAM/anime-blush.gif" },
+      { msg: "So tell me... do you ever think of me when things go quiet?", gif: "https://media.tenor.com/gb5rKkKQax8AAAAM/anime-shy.gif" },
+      { msg: "Come on now... don’t lie to me.", gif: "https://media.tenor.com/7h3WiIbt0Z4AAAAM/anime-wink.gif" },
+      { msg: "The truth always tries to run — but let’s be honest.", gif: "https://media.tenor.com/m8NRVdaF8ksAAAAM/anime-heart.gif" },
+      { msg: "So... what's your answer?", gif: "https://media.tenor.com/kqHqXAwCcf0AAAAM/anime-hug-love.gif", final: true, runaway: true }
+    ];
+
+    // DOM
+    const piano = document.getElementById('piano');
+    const unmute = document.getElementById('unmute');
+    const unmuteBtn = document.getElementById('unmuteBtn');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const bear = document.getElementById('bear');
+    const text = document.getElementById('text');
+    const yes = document.getElementById('yes');
+    const no = document.getElementById('no');
+    const buttons = document.getElementById('buttons');
+    const noMessage = document.getElementById('noMessage');
+    const hint = document.getElementById('hint');
+    const container = document.getElementById('container');
+    const overlay = document.getElementById('overlay');
+    const celebrateGif = document.getElementById('celebrateGif');
+
+    let idx = 0;
+    let gestureStarted = false;
+    let playbackAllowed = false;
+    let hintShown = false;
+
+    /* reveal UI */
+    function revealUI(){ bear.classList.add('fade-in'); text.classList.add('fade-in'); buttons.classList.add('fade-in'); }
+    setTimeout(revealUI, 80);
+
+    /* inline svg fallback */
+    const svgFallback = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200"><rect width="100%" height="100%" fill="#fff"/><text x="50%" y="55%" font-size="28" text-anchor="middle" fill="#ff6ea1" font-family="Poppins,sans-serif">❤</text></svg>'
+    );
+    bear.addEventListener('error', () => { if (bear.src !== svgFallback) bear.src = svgFallback; });
+
+    /* audio - start muted to avoid autoplay block; will unmute on user gesture */
+    function prepareAudio() {
+      piano.muted = true;      // start muted
+      piano.volume = 0.75;
+      piano.play().catch(()=>{ /* ignore initial block */ });
+    }
+    prepareAudio();
+
+    function showHint(){
+      if(!hintShown){ hint.style.display = 'block'; hintShown = true; }
+    }
+
+    function tryUnmuteAfterGesture(){
+      // called once on first user gesture (click/touch) so browsers accept playback
+      if(gestureStarted) return;
+      gestureStarted = true;
+      piano.muted = false;
+      piano.play().then(() => {
+        playbackAllowed = true;
+        unmute.style.display = 'none';
+        modalBackdrop.style.display = 'none';
+        modalBackdrop.setAttribute('aria-hidden','true');
+      }).catch(() => {
+        // still blocked by stricter policies: show unmute control + a hint
+        playbackAllowed = false;
+        unmute.style.display = 'flex';
+        modalBackdrop.style.display = 'flex';
+        modalBackdrop.setAttribute('aria-hidden','false');
+        showHint();
+      });
+    }
+
+    // Unmute control if still blocked
+    unmuteBtn.addEventListener('click', () => {
+      piano.muted = false;
+      piano.play().then(() => {
+        unmute.style.display = 'none';
+        modalBackdrop.style.display = 'none';
+        modalBackdrop.setAttribute('aria-hidden','true');
+      }).catch(() => {
+        alert('Playback still blocked. Please allow sound for this site in your browser settings and try again.');
+      });
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      modalBackdrop.style.display = 'none';
+      modalBackdrop.setAttribute('aria-hidden','true');
+    });
+
+    // -- No button movement (compact)
+    function moveNoRandomInsideContainer(){
+      const padding = 12;
+      const maxX = Math.max(0, container.clientWidth - no.offsetWidth - padding*2);
+      const maxY = Math.max(0, container.clientHeight - no.offsetHeight - padding*2);
+      let x = padding, y = padding;
+      if (maxX > 0 && maxY > 0) { x = Math.random() * maxX + padding; y = Math.random() * maxY + padding; }
+      no.style.position = 'absolute';
+      no.style.left = `${x}px`;
+      no.style.top = `${y}px`;
+      no.style.transition = 'left 240ms ease, top 240ms ease, transform 160ms ease';
+      no.style.transform = 'translateY(-8px)'; setTimeout(()=>{ no.style.transform = ''; }, 220);
+    }
+
+    function moveNoCompletelyAway() {
+      const padding = 20;
+      const x = container.clientWidth + padding + Math.random() * 180;
+      const y = Math.random() * Math.max(0, container.clientHeight - no.offsetHeight);
+      no.style.position = 'absolute';
+      no.style.left = `${x}px`;
+      no.style.top = `${y}px`;
+      no.style.transition = 'left 420ms ease, top 420ms ease, opacity 220ms ease';
+      no.style.opacity = '0.95';
+      setTimeout(()=>{ no.disabled = true; no.style.pointerEvents = 'none'; }, 420);
+    }
+
+    function clearNoHandlers(){ no.onmouseenter = null; no.ontouchstart = null; no.onclick = null; }
+
+    function showCelebration(s){
+      celebrateGif.src = s.gif || bear.src;
+      overlay.style.display = 'flex';
+      overlay.setAttribute('aria-hidden','false');
+    }
+    function hideCelebration(){ overlay.style.display = 'none'; overlay.setAttribute('aria-hidden','true'); }
+
+    // show slide
+    function showSlide(i){
+      const s = slides[i];
+      clearNoHandlers();
+      // reset styles
+      no.style.position = '';
+      no.style.left = '';
+      no.style.top = '';
+      no.style.opacity = '';
+      no.disabled = false;
+      no.style.pointerEvents = '';
+      noMessage.style.display = 'none';
+
+      // update UI (slight delay for UX)
+      setTimeout(() => {
+        bear.src = s.gif;
+        text.textContent = s.msg;
+        bear.classList.add('fade-in');
+        text.classList.add('fade-in');
+        buttons.classList.add('fade-in');
+
+        // final slide runaway config
+        if (s.final && s.runaway) {
+          no.onmouseenter = () => moveNoRandomInsideContainer();
+          no.ontouchstart = (e) => { e.preventDefault(); moveNoRandomInsideContainer(); };
+          no.onclick = (e) => { e.preventDefault(); moveNoCompletelyAway(); noMessage.style.display = 'block'; return false; };
+
+          yes.onclick = (ev) => { tryUnmuteAfterGesture(); showCelebration(s); };
+          yes.ontouchstart = (ev) => { tryUnmuteAfterGesture(); showCelebration(s); };
+        } else {
+          // default progression: both buttons act as next slide
+          yes.onclick = (ev) => { tryUnmuteAfterGesture(); nextSlide(); };
+          no.onclick = (ev) => { tryUnmuteAfterGesture(); nextSlide(); };
+          // touch starts as well
+          yes.ontouchstart = (ev) => { tryUnmuteAfterGesture(); nextSlide(); };
+          no.ontouchstart = (ev) => { tryUnmuteAfterGesture(); nextSlide(); };
+        }
+      }, 120);
+    }
+
+    function nextSlide(){ idx++; if (idx >= slides.length) idx = slides.length - 1; showSlide(idx); }
+
+    // keyboard nav - allow advancing with ArrowRight
+    window.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') nextSlide(); });
+
+    // retry autoplay when tab visibility changes
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && gestureStarted) { piano.play().catch(()=>{}); } });
+
+    // hide celebration when overlay clicked
+    overlay.addEventListener('click', hideCelebration);
+
+    // Start
+    showSlide(idx);
+
+    // Also allow entire container click to start audio (for people who click outside buttons)
+    container.addEventListener('click', (e) => {
+      // if user clicked a button, tryUnmuteAfterGesture already runs; this helps for clicks elsewhere
+      tryUnmuteAfterGesture();
+    }, { once: true });
+
+    // If the browser blocked unmuting even after interaction, show the unmute helper after a short delay
+    setTimeout(() => {
+      if (!playbackAllowed && gestureStarted) {
+        unmute.style.display = 'flex';
+        showHint();
+      }
+    }, 800);
+
+    // Accessibility: touchstart on body triggers the gesture logic as well
+    document.body.addEventListener('touchstart', () => { tryUnmuteAfterGesture(); }, { passive: true, once: true });
+  </script>
 </body>
 </html>
